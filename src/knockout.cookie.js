@@ -1,27 +1,23 @@
 (function (ko, undefined) {
-	var setCookie = function (cname, cvalue, exdays) {
-						var d = new Date();
-						if (exdays === undefined) {
-							exdays = 365;
+	var setCookie = function (key, value, expireDays) {
+						var expires = new Date();
+						if (expireDays === undefined) {
+							expireDays = 365;
 						}
-						d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-						var expires = "expires=" + d.toUTCString();
-						document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+						expires.setTime(expires.getTime() + (expireDays * 24 * 60 * 60 * 1000));
+						var expires = "expires=" + expires.toUTCString();
+						document.cookie = key + "=" + value + ";" + expires + ";path=/";
 					},
-		hasCookie = function (cname) {
-						return getCookie(cname) !== undefined;
-					},
-		getCookie = function (cname) {
-						var name = cname + "=";
-						var decodedCookie = decodeURIComponent(document.cookie);
-						var ca = decodedCookie.split(';');
-						for (var i = 0; i < ca.length; i++) {
-							var c = ca[i];
-							while (c.charAt(0) == ' ') {
-								c = c.substring(1);
+		getCookie = function (key) {
+						var name = key + "=",
+							cookies = decodeURIComponent(document.cookie).split(';');
+						for (var c = 0; c < cookies.length; c++) {
+							var cookie = cookies[c];
+							while (cookie.charAt(0) === ' ') {
+								cookie = cookie.substring(1);
 							}
-							if (c.indexOf(name) == 0) {
-								return c.substring(name.length, c.length);
+							if (cookie.indexOf(name) == 0) {
+								return cookie.substring(name.length, cookie.length);
 							}
 						}
 					};
@@ -29,7 +25,7 @@
 	ko.extenders.cookie = function (target, key) {
 		var initialValue = target();
 
-		if (key && hasCookie(key) !== null) {
+		if (key && getCookie(key) !== undefined) {
 			try {
 				initialValue = JSON.parse(getCookie(key));
 			} catch (e) {
